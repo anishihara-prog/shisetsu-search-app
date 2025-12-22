@@ -4,7 +4,7 @@ import re
 
 st.title(" 事業所一覧検索アプリ")
 
-FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx"
+FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx&v=2"
 
 # ✅ タブ名ごとの内容マスタ
 NAIYO_MASTER = {
@@ -114,5 +114,6 @@ st.write(f"検索結果：{len(result)} 件")
 st.write("列名一覧：", result.columns.tolist())
 
 st.dataframe(result)
+
 
 
