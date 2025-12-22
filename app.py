@@ -84,7 +84,7 @@ shisetsu = st.text_input("施設名（部分一致）")
 address = st.text_input("住所（部分一致）")
 jigyosho = st.text_input("事業所（部分一致）")
 jigyosho_no = st.text_input("事業所番号（完全一致）")
-tel = st.text_input("電話番号（完全一致）")
+tel = st.text_input("電話番号（完全一致）ハイフンを入れてください。")
 
 # ✅ 検索処理
 result = df.copy()
@@ -114,6 +114,7 @@ if tel and "電話番号" in result.columns:
 # ✅ 結果表示
 st.write(f"検索結果：{len(result)} 件")
 st.dataframe(result)
+
 
 
 
