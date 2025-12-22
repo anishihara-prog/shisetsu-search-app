@@ -2,9 +2,11 @@ import streamlit as st
 import pandas as pd
 import re
 
-st.title(" 事業所一覧検索アプリ")
+st.title("事業所一覧検索アプリ")
 
-FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx&v=2"
+# ✅ キャッシュを使わず常に最新を取得（重要）
+FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx&v=3"
+
 # ✅ タブ名ごとの内容マスタ
 NAIYO_MASTER = {
     "相談支援事業所": [
@@ -46,38 +48,38 @@ NAIYO_MASTER = {
     ]
 }
 
-@st.cache_data
+# ✅ 常に最新を読み込む
 def load_sheets():
     return pd.read_excel(FILE_URL, sheet_name=None)
 
 all_sheets = load_sheets()
 
-# ✅ ✅ ✅ タブ名プルダウンに「オプションを選択してください」を追加
+# ✅ プルダウン
 tab_names = ["オプションを選択してください"] + list(all_sheets.keys())
+selected_tab = st.selectbox("Excelのタブ名（シート名）を選択", tab_names)
 
-selected_tab = st.selectbox(
-    "Excelのタブ名（シート名）を選択",
-    tab_names
-)
-
-# ✅ 選択されていない場合は処理を止める（誤爆防止）
 if selected_tab == "オプションを選択してください":
     st.stop()
 
-# ✅ 選択されたシートを読み込み
-df = all_sheets[selected_tab]
+# ✅ 選択されたシート
+df = all_sheets[selected_tab].copy()
+
+# ✅ 列名の前後空白・改行を除去（行政データ対策）
+df.columns = df.columns.str.strip().str.replace("\n", "", regex=False)
+
+# ✅ 住所列の候補 → 自動で「住所」に統一
+ADDRESS_CANDIDATES = ["住所", "所在地", "住所地", "住所１", "住所1", "所在地住所"]
+
+for col in ADDRESS_CANDIDATES:
+    if col in df.columns:
+        df = df.rename(columns={col: "住所"})
+        break
 
 # ✅ 内容プルダウン
 naiyo_list = NAIYO_MASTER.get(selected_tab, [])
-selected_naiyo = st.multiselect(
-    "内容（複数選択できます）",
-    naiyo_list,
-    placeholder="オプションを選択してください"
-)
+selected_naiyo = st.multiselect("内容（複数選択できます）", naiyo_list)
 
-#st.write("=== 使用している naiyo_list ===", naiyo_list)
-
-# ✅ その他検索
+# ✅ その他検索項目
 shisetsu = st.text_input("施設名（部分一致）")
 address = st.text_input("住所（部分一致）")
 jigyosho = st.text_input("事業所（部分一致）")
@@ -87,31 +89,30 @@ tel = st.text_input("電話番号（完全一致）")
 # ✅ 検索処理
 result = df.copy()
 
-# ✅ 内容（語単位 AND 条件）
+# ✅ 内容（AND 条件）
 if selected_naiyo:
     for word in selected_naiyo:
         result = result[result["内容"].astype(str).str.contains(rf"\b{word}\b", na=False)]
 
-# ✅ 部分一致検索
-if shisetsu:
+# ✅ 部分一致
+if shisetsu and "施設名" in result.columns:
     result = result[result["施設名"].astype(str).str.contains(shisetsu, case=False)]
 
-if address:
+if address and "住所" in result.columns:
     result = result[result["住所"].astype(str).str.contains(address, case=False)]
 
-if jigyosho:
+if jigyosho and "事業所" in result.columns:
     result = result[result["事業所"].astype(str).str.contains(jigyosho, case=False)]
 
 # ✅ 完全一致
-if jigyosho_no:
+if jigyosho_no and "事業所番号" in result.columns:
     result = result[result["事業所番号"].astype(str) == jigyosho_no]
 
-if tel:
+if tel and "電話番号" in result.columns:
     result = result[result["電話番号"].astype(str) == tel]
 
+# ✅ 結果表示
 st.write(f"検索結果：{len(result)} 件")
-st.write("列名一覧：", result.columns.tolist())
-
 st.dataframe(result)
 
 
