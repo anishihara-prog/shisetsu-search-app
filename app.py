@@ -5,7 +5,7 @@ import re
 st.title("事業所一覧検索アプリ")
 
 # ✅ キャッシュを使わず常に最新を取得（重要）
-FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx&v=3"
+FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx&v=5"
 
 # ✅ タブ名ごとの内容マスタ
 NAIYO_MASTER = {
@@ -75,16 +75,22 @@ for col in ADDRESS_CANDIDATES:
         df = df.rename(columns={col: "住所"})
         break
 
+# ✅ 施設名をトップに
+shisetsu = st.text_input("施設名（部分一致）")
+
 # ✅ 内容プルダウン
 naiyo_list = NAIYO_MASTER.get(selected_tab, [])
-selected_naiyo = st.multiselect("内容（複数選択できます）", naiyo_list)
+selected_naiyo = st.multiselect(
+    "内容（複数選択できます）",
+    naiyo_list,
+    placeholder="オプションを選択してください"
+)
 
-# ✅ その他検索項目
-shisetsu = st.text_input("施設名（部分一致）")
+# ✅ その他検索
 address = st.text_input("住所（部分一致）")
 jigyosho = st.text_input("事業所（部分一致）")
 jigyosho_no = st.text_input("事業所番号（完全一致）")
-tel = st.text_input("電話番号（完全一致）ハイフンを入れてください。")
+tel = st.text_input("電話番号（完全一致）")
 
 # ✅ 検索処理
 result = df.copy()
