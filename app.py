@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import re
 
-st.title("施設一覧検索アプリ")
+st.title(" 事業所一覧検索アプリ")
 
 FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx"
 
@@ -113,3 +113,4 @@ if tel:
 st.write(f"検索結果：{len(result)} 件")
 
 st.dataframe(result)
+
