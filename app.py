@@ -111,6 +111,8 @@ if tel:
     result = result[result["電話番号"].astype(str) == tel]
 
 st.write(f"検索結果：{len(result)} 件")
+st.write("列名一覧：", result.columns.tolist())
 
 st.dataframe(result)
+
 
