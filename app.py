@@ -104,7 +104,7 @@ naiyo_list = NAIYO_MASTER.get(selected_tab, [])
 selected_naiyo = st.multiselect(
     "内容（複数選択できます）",
     naiyo_list,
-    placeholder="オプションを選択してください"
+    placeholder="オプションを選択してください")
 
 
 # =========================
@@ -151,6 +151,7 @@ if tel and "電話番号" in result.columns:
 # =========================
 st.write(f"検索結果：{len(result)} 件")
 st.dataframe(result)
+
 
 
 
