@@ -58,10 +58,6 @@ def load_sheets():
 
 all_sheets = load_sheets()
 
-# =========================
-#  ① 施設名（トップ）
-# =========================
-shisetsu = st.text_input("施設名（部分一致）")
 
 # =========================
 #  ② タブ選択
@@ -95,6 +91,11 @@ if "区分" in df.columns:
     selected_kubun = st.selectbox("区分を選択", ["すべて"] + kubun_list)
 else:
     selected_kubun = "すべて"
+# =========================
+#  ① 施設名（トップ）
+# =========================
+shisetsu = st.text_input("施設名（部分一致）")
+
 
 # =========================
 #  ④ 内容プルダウン
@@ -150,6 +151,7 @@ if tel and "電話番号" in result.columns:
 # =========================
 st.write(f"検索結果：{len(result)} 件")
 st.dataframe(result)
+
 
 
 
