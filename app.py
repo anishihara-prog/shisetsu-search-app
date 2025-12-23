@@ -4,7 +4,7 @@ import re
 
 st.title("事業所一覧検索アプリ")
 
-# ✅ キャッシュを使わず常に最新を取得
+# 常に最新取得
 FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx&v=6"
 
 # =========================
@@ -51,16 +51,15 @@ NAIYO_MASTER = {
 }
 
 # =========================
-#  Excel 読み込み（キャッシュなし）
+#  Excel 読み込み
 # =========================
 def load_sheets():
     return pd.read_excel(FILE_URL, sheet_name=None)
 
 all_sheets = load_sheets()
 
-
 # =========================
-#  ② タブ選択
+#  タブ選択
 # =========================
 tab_names = ["オプションを選択してください"] + list(all_sheets.keys())
 selected_tab = st.selectbox("Excelのタブ名（シート名）を選択", tab_names)
@@ -73,7 +72,7 @@ if selected_tab == "オプションを選択してください":
 # =========================
 df = all_sheets[selected_tab].copy()
 
-# 列名の空白・改行除去
+# 列名整形
 df.columns = df.columns.str.strip().str.replace("\n", "", regex=False)
 
 # 住所列の統一
@@ -82,9 +81,9 @@ for col in ADDRESS_CANDIDATES:
     if col in df.columns:
         df = df.rename(columns={col: "住所"})
         break
-    selected_kubun = "すべて"
+
 # =========================
-#  ① 施設名（トップ）
+#  ① 施設名
 # =========================
 shisetsu = st.text_input("施設名（部分一致）")
 
@@ -95,7 +94,7 @@ if "区分" in df.columns:
     kubun_list = sorted(df["区分"].dropna().unique())
     selected_kubun = st.selectbox("区分を選択", ["すべて"] + kubun_list)
 else:
-
+    selected_kubun = "すべて"
 
 # =========================
 #  ④ 内容プルダウン
@@ -104,8 +103,8 @@ naiyo_list = NAIYO_MASTER.get(selected_tab, [])
 selected_naiyo = st.multiselect(
     "内容（複数選択できます）",
     naiyo_list,
-    placeholder="オプションを選択してください")
-
+    placeholder="オプションを選択してください"
+)
 
 # =========================
 #  ⑤ その他検索
@@ -125,9 +124,9 @@ if selected_kubun != "すべて" and "区分" in result.columns:
     result = result[result["区分"] == selected_kubun]
 
 # 内容（AND）
-if selected_naiyo:
+if selected_naiyo and "内容" in result.columns:
     for word in selected_naiyo:
-        result = result[result["内容"].astype(str).str.contains(rf"\b{word}\b", na=False)]
+        result = result[result["内容"].astype(str).str.contains(word, na=False)]
 
 # 部分一致
 if shisetsu and "施設名" in result.columns:
@@ -151,6 +150,7 @@ if tel and "電話番号" in result.columns:
 # =========================
 st.write(f"検索結果：{len(result)} 件")
 st.dataframe(result)
+
 
 
 
