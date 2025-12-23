@@ -4,10 +4,12 @@ import re
 
 st.title("事業所一覧検索アプリ")
 
-# ✅ キャッシュを使わず常に最新を取得（重要）
-FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx&v=5"
+# ✅ キャッシュを使わず常に最新を取得
+FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx&v=6"
 
-# ✅ タブ名ごとの内容マスタ
+# =========================
+#  内容マスタ
+# =========================
 NAIYO_MASTER = {
     "相談支援事業所": [
         "計画","移行","定着","障害児","発達支援","生活介護","医療的ケア",
@@ -48,37 +50,55 @@ NAIYO_MASTER = {
     ]
 }
 
-# ✅ 常に最新を読み込む
+# =========================
+#  Excel 読み込み（キャッシュなし）
+# =========================
 def load_sheets():
     return pd.read_excel(FILE_URL, sheet_name=None)
 
 all_sheets = load_sheets()
 
-# ✅ プルダウン
+# =========================
+#  ① 施設名（トップ）
+# =========================
+shisetsu = st.text_input("施設名（部分一致）")
+
+# =========================
+#  ② タブ選択
+# =========================
 tab_names = ["オプションを選択してください"] + list(all_sheets.keys())
 selected_tab = st.selectbox("Excelのタブ名（シート名）を選択", tab_names)
 
 if selected_tab == "オプションを選択してください":
     st.stop()
 
-# ✅ 選択されたシート
+# =========================
+#  シート読み込み
+# =========================
 df = all_sheets[selected_tab].copy()
 
-# ✅ 列名の前後空白・改行を除去（行政データ対策）
+# 列名の空白・改行除去
 df.columns = df.columns.str.strip().str.replace("\n", "", regex=False)
 
-# ✅ 住所列の候補 → 自動で「住所」に統一
+# 住所列の統一
 ADDRESS_CANDIDATES = ["住所", "所在地", "住所地", "住所１", "住所1", "所在地住所"]
-
 for col in ADDRESS_CANDIDATES:
     if col in df.columns:
         df = df.rename(columns={col: "住所"})
         break
 
-# ✅ 施設名をトップに
-shisetsu = st.text_input("施設名（部分一致）")
+# =========================
+#  ③ 区分プルダウン
+# =========================
+if "区分" in df.columns:
+    kubun_list = sorted(df["区分"].dropna().unique())
+    selected_kubun = st.selectbox("区分を選択", ["すべて"] + kubun_list)
+else:
+    selected_kubun = "すべて"
 
-# ✅ 内容プルダウン
+# =========================
+#  ④ 内容プルダウン
+# =========================
 naiyo_list = NAIYO_MASTER.get(selected_tab, [])
 selected_naiyo = st.multiselect(
     "内容（複数選択できます）",
@@ -86,21 +106,29 @@ selected_naiyo = st.multiselect(
     placeholder="オプションを選択してください"
 )
 
-# ✅ その他検索
+# =========================
+#  ⑤ その他検索
+# =========================
 address = st.text_input("住所（部分一致）")
 jigyosho = st.text_input("事業所（部分一致）")
 jigyosho_no = st.text_input("事業所番号（完全一致）")
 tel = st.text_input("電話番号（完全一致）")
 
-# ✅ 検索処理
+# =========================
+#  検索処理
+# =========================
 result = df.copy()
 
-# ✅ 内容（AND 条件）
+# 区分
+if selected_kubun != "すべて" and "区分" in result.columns:
+    result = result[result["区分"] == selected_kubun]
+
+# 内容（AND）
 if selected_naiyo:
     for word in selected_naiyo:
         result = result[result["内容"].astype(str).str.contains(rf"\b{word}\b", na=False)]
 
-# ✅ 部分一致
+# 部分一致
 if shisetsu and "施設名" in result.columns:
     result = result[result["施設名"].astype(str).str.contains(shisetsu, case=False)]
 
@@ -110,16 +138,19 @@ if address and "住所" in result.columns:
 if jigyosho and "事業所" in result.columns:
     result = result[result["事業所"].astype(str).str.contains(jigyosho, case=False)]
 
-# ✅ 完全一致
+# 完全一致
 if jigyosho_no and "事業所番号" in result.columns:
     result = result[result["事業所番号"].astype(str) == jigyosho_no]
 
 if tel and "電話番号" in result.columns:
     result = result[result["電話番号"].astype(str) == tel]
 
-# ✅ 結果表示
+# =========================
+#  結果表示
+# =========================
 st.write(f"検索結果：{len(result)} 件")
 st.dataframe(result)
+
 
 
 
