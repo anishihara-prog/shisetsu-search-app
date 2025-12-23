@@ -82,6 +82,11 @@ for col in ADDRESS_CANDIDATES:
     if col in df.columns:
         df = df.rename(columns={col: "住所"})
         break
+    selected_kubun = "すべて"
+# =========================
+#  ① 施設名（トップ）
+# =========================
+shisetsu = st.text_input("施設名（部分一致）")
 
 # =========================
 #  ③ 区分プルダウン
@@ -90,11 +95,6 @@ if "区分" in df.columns:
     kubun_list = sorted(df["区分"].dropna().unique())
     selected_kubun = st.selectbox("区分を選択", ["すべて"] + kubun_list)
 else:
-    selected_kubun = "すべて"
-# =========================
-#  ① 施設名（トップ）
-# =========================
-shisetsu = st.text_input("施設名（部分一致）")
 
 
 # =========================
@@ -151,6 +151,7 @@ if tel and "電話番号" in result.columns:
 # =========================
 st.write(f"検索結果：{len(result)} 件")
 st.dataframe(result)
+
 
 
 
