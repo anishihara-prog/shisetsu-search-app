@@ -5,7 +5,7 @@ import re
 st.title("事業所一覧検索アプリ")
 
 # 常に最新取得
-FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx&v=6"
+FILE_URL = "https://docs.google.com/spreadsheets/d/1caVKtJSJGkTq681J-fH6duvrOAHzY1uA/export?format=xlsx&v=7"
 
 # =========================
 #  内容マスタ
@@ -150,6 +150,7 @@ if tel and "電話番号" in result.columns:
 # =========================
 st.write(f"検索結果：{len(result)} 件")
 st.dataframe(result)
+
 
 
 
