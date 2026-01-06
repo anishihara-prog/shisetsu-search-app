@@ -61,10 +61,10 @@ all_sheets = load_sheets()
 # =========================
 #  タブ選択
 # =========================
-tab_names = ["選択してください"] + list(all_sheets.keys()) 
-selected_tab = st.selectbox("事業所の種類選択", tab_names)
-if selected_tab == "選択してください": 
+tab_names = ["ab"] + list(all_sheets.keys()) selected_tab = st.selectbox("cd", tab_names)
+if selected_tab == "ab": 
     st.stop()
+
 
 
 # =========================
@@ -150,6 +150,7 @@ if tel and "電話番号" in result.columns:
 # =========================
 st.write(f"検索結果：{len(result)} 件")
 st.dataframe(result)
+
 
 
 
