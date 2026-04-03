@@ -5,7 +5,8 @@ import re
 st.title("事業所一覧検索アプリ")
 
 # 常に最新取得
-FILE_URL = "https://drive.google.com/uc?export=download&id=FILE_ID"
+FILE_URL = "FILE_URL = "https://drive.google.com/uc?export=download&id=1caVKtJSJGkTq681J-fH6duvrOAHzY1uA"
+"
                                                                                 
 
 # =========================
