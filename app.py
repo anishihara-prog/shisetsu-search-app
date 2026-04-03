@@ -4,11 +4,10 @@ import re
 
 st.title("事業所一覧検索アプリ")
 
-# 常に最新取得
+# =========================
+#  常に最新取得（Google Sheets）
+# =========================
 FILE_URL = "https://docs.google.com/spreadsheets/d/1INxK9Lpy7nAY6eZ2chAo-52Cr3UFJQup4RxPuJ_NevA/export?format=xlsx"
-
-
-                                                                                
 
 # =========================
 #  内容マスタ
@@ -40,7 +39,8 @@ NAIYO_MASTER = {
     "グループホーム": [
         "女性棟","男性棟","マンションタイプ","ワンルームタイプ","個室",
         "手作り","短期入所","ペット可","日中サービス支援型",
-        "自立生活援助","住宅型有料","精神","難病","医療","緊急受け入れ対応","強度行動障害"
+        "自立生活援助","住宅型有料","精神","難病","医療",
+        "緊急受け入れ対応","強度行動障害"
     ],
     "短期入所": [
         "計画","移行","定着","障害児","発達支援","生活介護","医療的ケア",
@@ -64,12 +64,10 @@ all_sheets = load_sheets()
 # =========================
 #  タブ選択
 # =========================
-tab_names = ["オプションを選択してください"] + list(all_sheets.keys()) 
+tab_names = ["オプションを選択してください"] + list(all_sheets.keys())
 selected_tab = st.selectbox("事業所の種類選択　(※入力必須)", tab_names)
-if selected_tab == "オプションを選択してください": 
+if selected_tab == "オプションを選択してください":
     st.stop()
-
-
 
 # =========================
 #  シート読み込み
@@ -154,7 +152,6 @@ if tel and "電話番号" in result.columns:
 # =========================
 st.write(f"検索結果：{len(result)} 件")
 st.dataframe(result)
-
 
 
 
