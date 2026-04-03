@@ -7,7 +7,7 @@ st.title("事業所一覧検索アプリ")
 # =========================
 #  常に最新取得（Google Sheets）
 # =========================
-FILE_URL = "https://docs.google.com/spreadsheets/d/16BeylaVj1jM3qiNRu0in2CqJz3wQ_cjyvSpsme2THgI/edit?usp=drive_link"
+FILE_URL = "https://docs.google.com/spreadsheets/d/1uHD8oL3cWn1IUlA68B_w2sZsvOLeI5kuydnf4AIpFBo/edit?usp=drive_link"
 
 # =========================
 #  内容マスタ
